@@ -8,13 +8,14 @@ interface MainMVP {
         fun showProgress()
         fun hideProgress()
         fun showCharacters(characters: List<Character>)
+        fun addCharacters(characters: List<Character>)
     }
 
     interface Presenter {
         fun onStart()
         fun onDestroy()
         fun characterClicked(character : Character)
-        fun onEndOfCharactersReached()
+        fun tryToLoadNextPage()
         fun refresh()
     }
 }

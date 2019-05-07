@@ -10,9 +10,9 @@ import com.codescrubs.rickandmortyapp.domain.Character
 import com.codescrubs.rickandmortyapp.mvp.MainMVP
 import com.codescrubs.rickandmortyapp.ui.adapters.CharacterListAdapter
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.Dispatchers
 
 class MainActivity : AppCompatActivity(), MainMVP.View {
+
 
     lateinit var presenter: MainMVP.Presenter
 
@@ -54,7 +54,11 @@ class MainActivity : AppCompatActivity(), MainMVP.View {
     }
 
     override fun showCharacters(characters: List<Character>) {
-        characterList.adapter = CharacterListAdapter(characters) { presenter.characterClicked(it) }
+        characterList.adapter = CharacterListAdapter(characters.toMutableList()) { presenter.characterClicked(it) }
+    }
+
+    override fun addCharacters(characters: List<Character>) {
+        (characterList.adapter as CharacterListAdapter).addCharacters(characters)
     }
 
     private fun setupCharacterListRecyclerView() {
@@ -64,8 +68,11 @@ class MainActivity : AppCompatActivity(), MainMVP.View {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
-                if (layoutManager.findLastCompletelyVisibleItemPosition() == layoutManager.itemCount - 1) {
-                    presenter.onEndOfCharactersReached()
+                // Change this value to set how "far" from the end we try loading new characters
+                val positionFromBottomOffset = 5
+
+                if (layoutManager.findLastCompletelyVisibleItemPosition() == layoutManager.itemCount - positionFromBottomOffset) {
+                    presenter.tryToLoadNextPage()
                 }
             }
         })
