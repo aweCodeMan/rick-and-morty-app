@@ -5,26 +5,25 @@ import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
-import android.widget.Toast
 import com.codescrubs.rickandmortyapp.R
-import com.codescrubs.rickandmortyapp.data.api.RickAndMortyClient
-import com.codescrubs.rickandmortyapp.extensions.toast
+import com.codescrubs.rickandmortyapp.domain.Character
+import com.codescrubs.rickandmortyapp.mvp.MainMVP
 import com.codescrubs.rickandmortyapp.ui.adapters.CharacterListAdapter
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), MainMVP.View {
+
+    lateinit var presenter: MainMVP.Presenter
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
         when (item.itemId) {
             R.id.navigation_character_list -> {
                 return@OnNavigationItemSelectedListener true
             }
-           /* R.id.navigation_favorites -> {
+            R.id.navigation_favorites -> {
                 return@OnNavigationItemSelectedListener true
-            }*/
+            }
         }
         false
     }
@@ -33,23 +32,42 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        characterList.layoutManager = LinearLayoutManager(this)
+        presenter = MainPresenter(this)
 
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+        swipeCharacterListContainer.setOnRefreshListener { presenter.refresh() }
+
+        setupCharacterListRecyclerView()
     }
 
     override fun onStart() {
         super.onStart()
+        presenter.onStart()
+    }
 
-        launch {
-            val result = RickAndMortyClient.rickAndMortyAPI.getCharactersAsync().await()
-            val adapter = CharacterListAdapter(result.results) {
-                toast(it.name)
-            }
+    override fun showProgress() {
+        swipeCharacterListContainer.isRefreshing = true
+    }
 
-            runOnUiThread {
-                characterList.adapter = adapter
+    override fun hideProgress() {
+        swipeCharacterListContainer.isRefreshing = false
+    }
+
+    override fun showCharacters(characters: List<Character>) {
+        characterList.adapter = CharacterListAdapter(characters) { presenter.characterClicked(it) }
+    }
+
+    private fun setupCharacterListRecyclerView() {
+        val layoutManager = LinearLayoutManager(this)
+        characterList.layoutManager = layoutManager
+        characterList.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                if (layoutManager.findLastCompletelyVisibleItemPosition() == layoutManager.itemCount - 1) {
+                    presenter.onEndOfCharactersReached()
+                }
             }
-        }
+        })
     }
 }
