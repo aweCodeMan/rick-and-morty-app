@@ -10,10 +10,9 @@ import com.codescrubs.rickandmortyapp.domain.Character
 import com.codescrubs.rickandmortyapp.mvp.MainMVP
 import com.codescrubs.rickandmortyapp.ui.adapters.CharacterListAdapter
 import kotlinx.android.synthetic.main.activity_main.*
+import org.jetbrains.anko.startActivity
 
 class MainActivity : AppCompatActivity(), MainMVP.View {
-
-
     lateinit var presenter: MainMVP.Presenter
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
@@ -35,7 +34,7 @@ class MainActivity : AppCompatActivity(), MainMVP.View {
         presenter = MainPresenter(this)
 
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
-        swipeCharacterListContainer.setOnRefreshListener { presenter.refresh() }
+        swipeCharacterListContainer.setOnRefreshListener { presenter.onRefreshSwiped() }
 
         setupCharacterListRecyclerView()
     }
@@ -54,7 +53,7 @@ class MainActivity : AppCompatActivity(), MainMVP.View {
     }
 
     override fun showCharacters(characters: List<Character>) {
-        characterList.adapter = CharacterListAdapter(characters.toMutableList()) { presenter.characterClicked(it) }
+        characterList.adapter = CharacterListAdapter(characters.toMutableList()) { presenter.onCharacterClicked(it) }
     }
 
     override fun addCharacters(characters: List<Character>) {
@@ -72,9 +71,13 @@ class MainActivity : AppCompatActivity(), MainMVP.View {
                 val positionFromBottomOffset = 5
 
                 if (layoutManager.findLastCompletelyVisibleItemPosition() == layoutManager.itemCount - positionFromBottomOffset) {
-                    presenter.tryToLoadNextPage()
+                    presenter.onEndOfListReached()
                 }
             }
         })
+    }
+
+    override fun showCharacterDetail(character: Character) {
+        startActivity<CharacterDetailActivity>(CharacterDetailActivity.CHARACTER to character)
     }
 }

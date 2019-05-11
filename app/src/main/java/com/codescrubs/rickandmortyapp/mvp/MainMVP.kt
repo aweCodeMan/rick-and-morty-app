@@ -9,13 +9,14 @@ interface MainMVP {
         fun hideProgress()
         fun showCharacters(characters: List<Character>)
         fun addCharacters(characters: List<Character>)
+        fun showCharacterDetail(character: Character)
     }
 
     interface Presenter {
         fun onStart()
         fun onDestroy()
-        fun characterClicked(character : Character)
-        fun tryToLoadNextPage()
-        fun refresh()
+        fun onCharacterClicked(character : Character)
+        fun onEndOfListReached()
+        fun onRefreshSwiped()
     }
 }

@@ -1,6 +1,11 @@
 package com.codescrubs.rickandmortyapp.domain
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
+
+
+@Parcelize
 data class Location(
-    val name : String,
-    val url : String
-)
+    val name: String,
+    val url: String
+) : Parcelable

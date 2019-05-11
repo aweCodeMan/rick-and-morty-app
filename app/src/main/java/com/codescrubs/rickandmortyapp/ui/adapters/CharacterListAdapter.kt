@@ -37,6 +37,7 @@ class CharacterListAdapter(private val characters: MutableList<Character>, priva
         fun bind(character: Character) {
             name.text = character.name
             origin.text = character.origin.name
+            location.text = character.location.name
             status.text = character.status
 
             Glide.with(containerView.context).load(character.image).fitCenter().into(image)

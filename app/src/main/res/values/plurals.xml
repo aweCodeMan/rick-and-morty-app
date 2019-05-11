@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="character_episodes">
+        <item quantity="one">Episode: %1$s</item>
+        <item quantity="other">Episodes: %1$s</item>
+    </plurals>
+</resources>

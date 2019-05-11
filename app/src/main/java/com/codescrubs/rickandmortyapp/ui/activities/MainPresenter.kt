@@ -18,22 +18,24 @@ class MainPresenter(private val view: MainMVP.View) : MainMVP.Presenter, Corouti
     override val coroutineContext: CoroutineContext = job + Dispatchers.IO
 
     override fun onStart() {
-        refreshCharacters()
+        if (paginatedCharacters == null) {
+            refreshCharacters()
+        }
     }
 
     override fun onDestroy() {
         job.cancel()
     }
 
-    override fun refresh() {
+    override fun onRefreshSwiped() {
         refreshCharacters()
     }
 
-    override fun characterClicked(character: Character) {
-        Log.d("MainPresenter", character.name)
+    override fun onCharacterClicked(character: Character) {
+        view.showCharacterDetail(character)
     }
 
-    override fun tryToLoadNextPage() {
+    override fun onEndOfListReached() {
         if (isLoadingNextPage) {
             return
         }
@@ -41,6 +43,7 @@ class MainPresenter(private val view: MainMVP.View) : MainMVP.Presenter, Corouti
         loadNextPage()
     }
 
+    //  TODO: Refactor this into a standalone data provider class
     private fun loadNextPage() {
         // Load a new page if we have an existing paginated result with a next link
         paginatedCharacters?.info!!.let {
@@ -63,6 +66,7 @@ class MainPresenter(private val view: MainMVP.View) : MainMVP.Presenter, Corouti
         }
     }
 
+    //  TODO: Refactor this into a standalone data provider class
     private fun refreshCharacters() {
         view.showProgress()
 
