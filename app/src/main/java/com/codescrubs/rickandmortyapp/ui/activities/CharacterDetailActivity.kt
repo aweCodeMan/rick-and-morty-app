@@ -1,15 +1,14 @@
 package com.codescrubs.rickandmortyapp.ui.activities
 
-import android.annotation.SuppressLint
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import com.bumptech.glide.Glide
 import com.codescrubs.rickandmortyapp.R
 import com.codescrubs.rickandmortyapp.domain.Character
-import com.codescrubs.rickandmortyapp.domain.Location
-import com.codescrubs.rickandmortyapp.extensions.toast
+import com.codescrubs.rickandmortyapp.domain.PartialLocation
 import com.codescrubs.rickandmortyapp.mvp.CharacterDetailMVP
 import kotlinx.android.synthetic.main.activity_character_detail.*
+import org.jetbrains.anko.startActivity
 
 
 class CharacterDetailActivity : AppCompatActivity(), CharacterDetailMVP.View {
@@ -47,7 +46,7 @@ class CharacterDetailActivity : AppCompatActivity(), CharacterDetailMVP.View {
         cardOrigin.setOnClickListener { presenter.onLocationClicked(character.origin) }
     }
 
-    override fun showLocationDetail(location: Location) {
-        toast(location.name)
+    override fun showLocationDetail(partialLocation: PartialLocation) {
+        startActivity<LocationDetailActivity>(LocationDetailActivity.LOCATION to partialLocation)
     }
 }

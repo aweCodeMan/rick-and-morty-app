@@ -5,10 +5,7 @@ import kotlinx.android.parcel.Parcelize
 
 
 @Parcelize
-data class Location(
+data class PartialLocation(
     val name: String,
-    val type: String,
-    val dimension: String,
-    val residents: List<String>,
     val url: String
 ) : Parcelable
