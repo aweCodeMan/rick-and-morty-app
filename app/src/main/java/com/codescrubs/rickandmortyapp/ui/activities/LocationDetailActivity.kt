@@ -7,6 +7,7 @@ import com.codescrubs.rickandmortyapp.domain.Location
 import com.codescrubs.rickandmortyapp.extensions.toast
 import com.codescrubs.rickandmortyapp.mvp.LocationDetailMVP
 import kotlinx.android.synthetic.main.activity_location_detail.*
+import org.jetbrains.anko.startActivity
 
 class LocationDetailActivity : AppCompatActivity(), LocationDetailMVP.View {
     lateinit var presenter: LocationDetailMVP.Presenter
@@ -33,11 +34,13 @@ class LocationDetailActivity : AppCompatActivity(), LocationDetailMVP.View {
     }
 
     override fun showProgress() {
+        swipeContainer.isEnabled = true
         swipeContainer.isRefreshing = true
     }
 
     override fun hideProgress() {
         swipeContainer.isRefreshing = false
+        swipeContainer.isEnabled = false
     }
 
     override fun showLocation(location: Location) {
@@ -49,7 +52,7 @@ class LocationDetailActivity : AppCompatActivity(), LocationDetailMVP.View {
         cardResidents.setOnClickListener { presenter.onShowResidentsClicked()}
     }
 
-    override fun showResidents() {
-        toast("Show residents")
+    override fun showResidents(location: Location) {
+        startActivity<LocationResidentsActivity>(LocationResidentsActivity.LOCATION to location)
     }
 }
