@@ -1,5 +1,6 @@
 package com.codescrubs.rickandmortyapp.ui.adapters
 
+import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -10,12 +11,18 @@ import com.codescrubs.rickandmortyapp.domain.Character
 import kotlinx.android.synthetic.main.item_character.*
 import kotlinx.android.extensions.LayoutContainer
 
-class CharacterListAdapter(private val characters: MutableList<Character>, private val itemClick: (Character) -> Unit) :
+class CharacterListAdapter(private val characters: MutableList<Character>, private val itemListener: ItemListener) :
     RecyclerView.Adapter<CharacterListAdapter.ViewHolder>() {
+
+    interface ItemListener {
+        fun onItemClick(character: Character)
+        fun onFavoriteClick(character: Character)
+        fun onUnfavoriteClick(character: Character)
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_character, parent, false)
-        return ViewHolder(view, itemClick)
+        return ViewHolder(view, itemListener)
     }
 
     override fun getItemCount(): Int {
@@ -31,7 +38,18 @@ class CharacterListAdapter(private val characters: MutableList<Character>, priva
         notifyItemRangeInserted(characters.size - addedCharacters.size, addedCharacters.size)
     }
 
-    class ViewHolder(override val containerView: View, private val itemClick: (Character) -> Unit) :
+    fun updateCharacter(character: Character) {
+        // TODO: Update Character class so you can use indexOf instead of find
+        val oldCharacter = characters.find { it.id == character.id }
+
+        oldCharacter?.let{
+            val index = characters.indexOf(oldCharacter)
+            characters[index] = character
+            notifyItemChanged(index)
+        }
+    }
+
+    class ViewHolder(override val containerView: View, private val itemListener: ItemListener) :
         RecyclerView.ViewHolder(containerView), LayoutContainer {
 
         fun bind(character: Character) {
@@ -43,7 +61,27 @@ class CharacterListAdapter(private val characters: MutableList<Character>, priva
             Glide.with(containerView.context).load(character.image).fitCenter().into(image)
             image.contentDescription = character.name
 
-            itemView.setOnClickListener { itemClick(character) }
+
+            itemView.setOnClickListener { itemListener.onItemClick(character) }
+            favorite.setOnClickListener { if (character.isFavorite) itemListener.onUnfavoriteClick(character) else itemListener.onFavoriteClick(character)}
+            setupFavoriteButton(character)
+        }
+
+        private fun setupFavoriteButton(character: Character) {
+            when (character.isFavorite) {
+                true -> favorite.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        containerView.context,
+                        R.drawable.ic_favorite_24dp
+                    )
+                )
+                false -> favorite.setImageDrawable(
+                    ContextCompat.getDrawable(
+                        containerView.context,
+                        R.drawable.ic_favorite_border_24dp
+                    )
+                )
+            }
         }
     }
 }

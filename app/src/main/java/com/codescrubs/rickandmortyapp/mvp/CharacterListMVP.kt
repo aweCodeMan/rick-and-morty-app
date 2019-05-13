@@ -1,22 +1,20 @@
 package com.codescrubs.rickandmortyapp.mvp
 
 import com.codescrubs.rickandmortyapp.domain.Character
+import com.codescrubs.rickandmortyapp.mvp.base.BaseCharacterListMVP
 
-interface MainMVP {
+interface CharacterListMVP {
 
-    interface View {
+    interface View: BaseCharacterListMVP.View {
         fun showProgress()
         fun hideProgress()
-        fun showCharacters(characters: List<Character>)
         fun addCharacters(characters: List<Character>)
-        fun showCharacterDetail(character: Character)
     }
 
-    interface Presenter {
+    interface Presenter: BaseCharacterListMVP.Presenter {
         fun onStart()
         fun onDestroy()
-        fun onCharacterClicked(character : Character)
-        fun onEndOfListReached()
         fun onRefreshSwiped()
+        fun onEndOfListReached()
     }
 }

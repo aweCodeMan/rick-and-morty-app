@@ -6,18 +6,20 @@ import com.codescrubs.rickandmortyapp.domain.Location
 import kotlinx.coroutines.Deferred
 import retrofit2.http.GET
 import retrofit2.http.Path
-import retrofit2.http.Query
 import retrofit2.http.Url
 
 interface RickAndMortyAPI {
     @GET("character")
-    fun getCharactersAsync(): Deferred<PaginatedResult<Character>>
-
-    @GET("character/{ids}")
-    fun getCharactersByIdsAsync(@Path("ids") ids: String): Deferred<List<Character>>
+    fun getPaginatedCharactersAsync(): Deferred<PaginatedResult<Character>>
 
     @GET
-    fun getNextCharactersPageAsync(@Url url: String): Deferred<PaginatedResult<Character>>
+    fun getPaginatedCharactersAsync(@Url url: String): Deferred<PaginatedResult<Character>>
+
+    @GET("character/{id}")
+    fun getCharacterAsync(@Path("id") id: String): Deferred<Character>
+
+    @GET("character/{ids}")
+    fun getCharactersAsync(@Path("ids") ids: String): Deferred<List<Character>>
 
     @GET
     fun getLocationAsync(@Url url: String): Deferred<Location>

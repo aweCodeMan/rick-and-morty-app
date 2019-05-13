@@ -4,7 +4,6 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import com.codescrubs.rickandmortyapp.R
 import com.codescrubs.rickandmortyapp.domain.Location
-import com.codescrubs.rickandmortyapp.extensions.toast
 import com.codescrubs.rickandmortyapp.mvp.LocationDetailMVP
 import kotlinx.android.synthetic.main.activity_location_detail.*
 import org.jetbrains.anko.startActivity

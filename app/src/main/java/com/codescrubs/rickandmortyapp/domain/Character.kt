@@ -3,7 +3,6 @@ package com.codescrubs.rickandmortyapp.domain
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 
-
 @Parcelize
 data class Character(
     val id: Long,
@@ -17,5 +16,6 @@ data class Character(
     val image: String,
     val episode: List<String>,
     val url: String,
-    val created: String
+    val created: String,
+    val isFavorite : Boolean = false
 ) : Parcelable

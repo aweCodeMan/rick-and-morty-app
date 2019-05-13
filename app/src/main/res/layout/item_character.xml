@@ -19,6 +19,15 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"/>
 
+        <ImageButton android:id="@+id/favorite"
+                     android:layout_width="0dp"
+                     android:layout_height="wrap_content"
+                     android:src="@drawable/ic_favorite_border_24dp"
+                     android:layout_marginTop="8dp"
+                     app:layout_constraintTop_toBottomOf="@id/image"
+                     app:layout_constraintStart_toStartOf="@id/image"
+                     app:layout_constraintEnd_toEndOf="@id/image"/>
+
         <TextView
                 android:id="@+id/name"
                 android:layout_width="0dp"
@@ -32,7 +41,7 @@
                 app:layout_constraintStart_toEndOf="@+id/image"
                 app:layout_constraintEnd_toEndOf="parent"
                 tools:text="Rick Sanchez Rick Sanchez"
-                 android:maxLines="2"
+                android:maxLines="2"
                 android:singleLine="false"/>
 
         <TextView
@@ -85,6 +94,7 @@
                 android:layout_marginEnd="8dp"
                 android:textSize="12sp"
                 android:text="@string/character_location_label"/>
+
         <TextView
                 android:id="@+id/location"
                 android:layout_width="0dp"
@@ -98,6 +108,8 @@
                 android:textSize="16sp"
                 android:textColor="#fff"
                 tools:text="Earth"/>
+
+
     </android.support.constraint.ConstraintLayout>
 
 </android.support.v7.widget.CardView>

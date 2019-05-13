@@ -1,16 +1,15 @@
-package com.codescrubs.rickandmortyapp.ui.activities
+package com.codescrubs.rickandmortyapp.ui.activities.main
 
 import com.codescrubs.rickandmortyapp.data.api.DataSource
 import com.codescrubs.rickandmortyapp.domain.Character
-import com.codescrubs.rickandmortyapp.domain.Location
-import com.codescrubs.rickandmortyapp.mvp.LocationResidentsMVP
+import com.codescrubs.rickandmortyapp.mvp.FavoriteListMVP
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
-class LocationResidentsPresenter(private val view: LocationResidentsMVP.View, private val location: Location) : LocationResidentsMVP.Presenter, CoroutineScope {
+class FavoriteListPresenter(private val view: FavoriteListMVP.View) : FavoriteListMVP.Presenter, CoroutineScope {
     private val job = Job()
-    private val dataSource by lazy { DataSource() }
 
+    private val dataSource by lazy { DataSource() }
 
     override val coroutineContext: CoroutineContext = job + Dispatchers.IO
 
@@ -18,7 +17,7 @@ class LocationResidentsPresenter(private val view: LocationResidentsMVP.View, pr
         view.showProgress()
 
         launch {
-            val result = dataSource.getCharactersByURLs(location.residents)
+            val result = dataSource.getFavoriteCharacters()
 
             withContext(Dispatchers.Main) {
                 view.showCharacters(result)

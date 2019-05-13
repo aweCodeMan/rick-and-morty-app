@@ -13,5 +13,7 @@ interface CharacterDetailMVP {
     interface Presenter {
         fun onStart()
         fun onLocationClicked(partialLocation: PartialLocation)
+        fun onCharacterFavored(character: Character)
+        fun onCharacterUnfavored(character: Character)
     }
 }
