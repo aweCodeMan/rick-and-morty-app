@@ -1,17 +1,25 @@
 package com.codescrubs.rickandmortyapp.ui.activities
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v4.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.codescrubs.rickandmortyapp.R
 import com.codescrubs.rickandmortyapp.domain.Character
 import com.codescrubs.rickandmortyapp.domain.PartialLocation
 import com.codescrubs.rickandmortyapp.mvp.CharacterDetailMVP
+import com.codescrubs.rickandmortyapp.ui.activities.base.BaseActivity
 import kotlinx.android.synthetic.main.activity_character_detail.*
+import kotlinx.android.synthetic.main.activity_character_detail.favorite
+import kotlinx.android.synthetic.main.activity_character_detail.image
+import kotlinx.android.synthetic.main.activity_character_detail.location
+import kotlinx.android.synthetic.main.activity_character_detail.name
+import kotlinx.android.synthetic.main.activity_character_detail.origin
+import kotlinx.android.synthetic.main.activity_character_detail.status
+import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.startActivity
 
 
-class CharacterDetailActivity : AppCompatActivity(), CharacterDetailMVP.View {
+class CharacterDetailActivity : BaseActivity(), CharacterDetailMVP.View {
     lateinit var presenter: CharacterDetailMVP.Presenter
 
     companion object {
@@ -21,6 +29,9 @@ class CharacterDetailActivity : AppCompatActivity(), CharacterDetailMVP.View {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_character_detail)
+
+        setSupportActionBar(toolbar)
+
         presenter = CharacterDetailPresenter(this, intent.getParcelableExtra(CHARACTER))
     }
 
@@ -44,6 +55,28 @@ class CharacterDetailActivity : AppCompatActivity(), CharacterDetailMVP.View {
 
         cardLocation.setOnClickListener { presenter.onLocationClicked(character.location) }
         cardOrigin.setOnClickListener { presenter.onLocationClicked(character.origin) }
+
+        when (character.isFavorite) {
+            true -> favorite.setImageDrawable(
+                ContextCompat.getDrawable(
+                    this,
+                    R.drawable.ic_favorite_24dp
+                )
+            )
+            false -> favorite.setImageDrawable(
+                ContextCompat.getDrawable(
+                    this,
+                    R.drawable.ic_favorite_border_24dp
+                )
+            )
+        }
+
+        favorite.setOnClickListener { if (character.isFavorite) presenter.onCharacterUnfavored(character) else presenter.onCharacterFavored(character)}
+
+        supportActionBar?.let {
+            it.title = character.name
+            it.setDisplayHomeAsUpEnabled(true)
+        }
     }
 
     override fun showLocationDetail(partialLocation: PartialLocation) {

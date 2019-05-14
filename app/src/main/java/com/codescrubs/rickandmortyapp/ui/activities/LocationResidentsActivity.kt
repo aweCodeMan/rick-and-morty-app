@@ -1,17 +1,18 @@
 package com.codescrubs.rickandmortyapp.ui.activities
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.Toolbar
 import com.codescrubs.rickandmortyapp.R
 import com.codescrubs.rickandmortyapp.domain.Character
+import com.codescrubs.rickandmortyapp.domain.Location
 import com.codescrubs.rickandmortyapp.mvp.LocationResidentsMVP
+import com.codescrubs.rickandmortyapp.ui.activities.base.BaseActivity
 import com.codescrubs.rickandmortyapp.ui.adapters.CharacterListAdapter
-import kotlinx.android.synthetic.main.activity_location_residents.characterList
-import kotlinx.android.synthetic.main.activity_location_residents.swipeCharacterListContainer
+import kotlinx.android.synthetic.main.activity_location_residents.*
 import org.jetbrains.anko.startActivity
 
-class LocationResidentsActivity : AppCompatActivity(), LocationResidentsMVP.View {
+class LocationResidentsActivity : BaseActivity(), LocationResidentsMVP.View {
 
 
     lateinit var presenter: LocationResidentsMVP.Presenter
@@ -24,9 +25,18 @@ class LocationResidentsActivity : AppCompatActivity(), LocationResidentsMVP.View
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_location_residents)
 
-        presenter = LocationResidentsPresenter(this, intent.getParcelableExtra(LOCATION))
+        val location : Location = intent.getParcelableExtra(LOCATION)
+        presenter = LocationResidentsPresenter(this, location)
 
         setupCharacterListRecyclerView()
+
+        setSupportActionBar(toolbar as Toolbar?)
+
+        supportActionBar?.let {
+            it.title = getString(R.string.location_residents_title, location.name)
+            it.setDisplayHomeAsUpEnabled(true)
+            (toolbar as Toolbar?)?.setNavigationOnClickListener { finish() }
+        }
     }
 
     override fun onStart() {
