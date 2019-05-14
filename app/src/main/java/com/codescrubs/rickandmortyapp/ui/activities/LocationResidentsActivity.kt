@@ -1,5 +1,6 @@
 package com.codescrubs.rickandmortyapp.ui.activities
 
+import android.arch.lifecycle.Lifecycle
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.Toolbar
@@ -13,8 +14,6 @@ import kotlinx.android.synthetic.main.activity_location_residents.*
 import org.jetbrains.anko.startActivity
 
 class LocationResidentsActivity : BaseActivity(), LocationResidentsMVP.View {
-
-
     lateinit var presenter: LocationResidentsMVP.Presenter
 
     companion object {
@@ -25,7 +24,7 @@ class LocationResidentsActivity : BaseActivity(), LocationResidentsMVP.View {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_location_residents)
 
-        val location : Location = intent.getParcelableExtra(LOCATION)
+        val location: Location = intent.getParcelableExtra(LOCATION)
         presenter = LocationResidentsPresenter(this, location)
 
         setupCharacterListRecyclerView()
@@ -50,34 +49,36 @@ class LocationResidentsActivity : BaseActivity(), LocationResidentsMVP.View {
     }
 
     override fun showProgress() {
-        swipeCharacterListContainer.isEnabled = true
-        swipeCharacterListContainer.isRefreshing = true
+        if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+            swipeCharacterListContainer.isEnabled = true
+            swipeCharacterListContainer.isRefreshing = true
+        }
     }
 
     override fun hideProgress() {
-        swipeCharacterListContainer.isRefreshing = false
-        swipeCharacterListContainer.isEnabled = false
+        if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+            swipeCharacterListContainer.isRefreshing = false
+            swipeCharacterListContainer.isEnabled = false
+        }
     }
 
     override fun showCharacters(characters: List<Character>) {
-        characterList.adapter = CharacterListAdapter(characters.toMutableList(), object : CharacterListAdapter.ItemListener{
-            override fun onItemClick(character: Character) {
-                presenter.onCharacterClicked(character)
-            }
+        if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+            characterList.adapter =
+                CharacterListAdapter(characters.toMutableList(), object : CharacterListAdapter.ItemListener {
+                    override fun onItemClick(character: Character) {
+                        presenter.onCharacterClicked(character)
+                    }
 
-            override fun onFavoriteClick(character: Character) {
-                presenter.onCharacterFavored(character)
-            }
+                    override fun onFavoriteClick(character: Character) {
+                        presenter.onCharacterFavored(character)
+                    }
 
-            override fun onUnfavoriteClick(character: Character) {
-                presenter.onCharacterUnfavored(character)
-            }
-        })
-    }
-
-    private fun setupCharacterListRecyclerView() {
-        val layoutManager = LinearLayoutManager(this)
-        characterList.layoutManager = layoutManager
+                    override fun onUnfavoriteClick(character: Character) {
+                        presenter.onCharacterUnfavored(character)
+                    }
+                })
+        }
     }
 
     override fun showCharacterDetail(character: Character) {
@@ -85,6 +86,13 @@ class LocationResidentsActivity : BaseActivity(), LocationResidentsMVP.View {
     }
 
     override fun updateCharacter(character: Character) {
-        (characterList.adapter as CharacterListAdapter).updateCharacter(character)
+        if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+            (characterList.adapter as CharacterListAdapter).updateCharacter(character)
+        }
+    }
+
+    private fun setupCharacterListRecyclerView() {
+        val layoutManager = LinearLayoutManager(this)
+        characterList.layoutManager = layoutManager
     }
 }

@@ -1,6 +1,7 @@
 package com.codescrubs.rickandmortyapp.ui.activities.main
 
 
+import android.arch.lifecycle.Lifecycle
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
@@ -40,36 +41,46 @@ class CharacterListFragment : Fragment(), CharacterListMVP.View {
     }
 
     override fun showProgress() {
-        swipeCharacterListContainer.isRefreshing = true
+        if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+            swipeCharacterListContainer.isRefreshing = true
+        }
     }
 
     override fun hideProgress() {
-        swipeCharacterListContainer.isRefreshing = false
+        if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+            swipeCharacterListContainer.isRefreshing = false
+        }
     }
 
     override fun showCharacters(characters: List<Character>) {
-        characterList.adapter =
-            CharacterListAdapter(characters.toMutableList(), object : CharacterListAdapter.ItemListener {
-                override fun onItemClick(character: Character) {
-                    presenter.onCharacterClicked(character)
-                }
+        if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+            characterList.adapter =
+                CharacterListAdapter(characters.toMutableList(), object : CharacterListAdapter.ItemListener {
+                    override fun onItemClick(character: Character) {
+                        presenter.onCharacterClicked(character)
+                    }
 
-                override fun onFavoriteClick(character: Character) {
-                    presenter.onCharacterFavored(character)
-                }
+                    override fun onFavoriteClick(character: Character) {
+                        presenter.onCharacterFavored(character)
+                    }
 
-                override fun onUnfavoriteClick(character: Character) {
-                    presenter.onCharacterUnfavored(character)
-                }
-            })
+                    override fun onUnfavoriteClick(character: Character) {
+                        presenter.onCharacterUnfavored(character)
+                    }
+                })
+        }
     }
 
     override fun addCharacters(characters: List<Character>) {
-        (characterList.adapter as CharacterListAdapter).addCharacters(characters)
+        if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+            (characterList.adapter as CharacterListAdapter).addCharacters(characters)
+        }
     }
 
     override fun updateCharacter(character: Character) {
-        (characterList.adapter as CharacterListAdapter).updateCharacter(character)
+        if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+            (characterList.adapter as CharacterListAdapter).updateCharacter(character)
+        }
     }
 
     private fun setupCharacterListRecyclerView() {

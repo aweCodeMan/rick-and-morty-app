@@ -70,6 +70,11 @@ class DataSource(private val client: RickAndMortyAPI = RickAndMortyClient.rickAn
         return character.copy(isFavorite = false)
     }
 
+    fun numberOfFavorites(): Int {
+        val favorites = HashSet(preferences.getStringSet(FAVORITE_CHARACTERS, HashSet()))
+        return favorites.size
+    }
+
     private fun handleFavorite(characters: List<Character>): List<Character> {
         return characters.map { handleFavorite(it) }
     }
@@ -82,4 +87,6 @@ class DataSource(private val client: RickAndMortyAPI = RickAndMortyClient.rickAn
         val favorites = preferences.getStringSet(FAVORITE_CHARACTERS, HashSet())
         return favorites!!.contains(character.id.toString())
     }
+
+
 }

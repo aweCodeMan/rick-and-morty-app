@@ -1,5 +1,6 @@
 package com.codescrubs.rickandmortyapp.ui.activities
 
+import android.arch.lifecycle.Lifecycle
 import android.os.Bundle
 import com.codescrubs.rickandmortyapp.R
 import com.codescrubs.rickandmortyapp.domain.Location
@@ -36,26 +37,32 @@ class LocationDetailActivity : BaseActivity(), LocationDetailMVP.View {
     }
 
     override fun showProgress() {
-        swipeContainer.isEnabled = true
-        swipeContainer.isRefreshing = true
+        if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+            swipeContainer.isEnabled = true
+            swipeContainer.isRefreshing = true
+        }
     }
 
     override fun hideProgress() {
-        swipeContainer.isRefreshing = false
-        swipeContainer.isEnabled = false
+        if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+            swipeContainer.isRefreshing = false
+            swipeContainer.isEnabled = false
+        }
     }
 
     override fun showLocation(location: Location) {
-        name.text = location.name
-        type.text = location.type
-        dimension.text = getString(R.string.location_dimension, location.dimension)
-        residents.text = getString(R.string.location_residents, location.residents.size.toString())
+        if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+            name.text = location.name
+            type.text = location.type
+            dimension.text = getString(R.string.location_dimension, location.dimension)
+            residents.text = getString(R.string.location_residents, location.residents.size.toString())
 
-        cardResidents.setOnClickListener { presenter.onShowResidentsClicked()}
+            cardResidents.setOnClickListener { presenter.onShowResidentsClicked() }
 
-        supportActionBar?.let {
-            it.title = location.name
-            it.setDisplayHomeAsUpEnabled(true)
+            supportActionBar?.let {
+                it.title = location.name
+                it.setDisplayHomeAsUpEnabled(true)
+            }
         }
     }
 

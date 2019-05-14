@@ -49,6 +49,17 @@ class CharacterListAdapter(private val characters: MutableList<Character>, priva
         }
     }
 
+    fun removeCharacter(character: Character) {
+        // TODO: Update Character class so you can use indexOf instead of find
+        val oldCharacter = characters.find { it.id == character.id }
+
+        oldCharacter?.let{
+            val index = characters.indexOf(oldCharacter)
+            characters.removeAt(index)
+            notifyItemRemoved(index)
+        }
+    }
+
     class ViewHolder(override val containerView: View, private val itemListener: ItemListener) :
         RecyclerView.ViewHolder(containerView), LayoutContainer {
 
