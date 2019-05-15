@@ -2,6 +2,7 @@ package com.codescrubs.rickandmortyapp.ui.activities.main
 
 import android.os.CountDownTimer
 import com.codescrubs.rickandmortyapp.data.api.DataSource
+import com.codescrubs.rickandmortyapp.data.api.response.Result
 import com.codescrubs.rickandmortyapp.domain.Character
 import com.codescrubs.rickandmortyapp.mvp.FavoriteListMVP
 import kotlinx.coroutines.*
@@ -17,7 +18,7 @@ class FavoriteListPresenter(private val view: FavoriteListMVP.View) : FavoriteLi
 
 
     companion object {
-        private val COUNTDOWN_MILIS = 2000L
+        private const val COUNTDOWN_MILLIS = 2000L
     }
 
     override fun onStart() {
@@ -29,9 +30,14 @@ class FavoriteListPresenter(private val view: FavoriteListMVP.View) : FavoriteLi
             withContext(Dispatchers.Main) {
                 view.hideProgress()
 
-                when (result.size) {
-                    0 -> view.showEmptyState()
-                    else -> view.showCharacters(result)
+                when (result) {
+                    is Result.Error -> view.showError(result.exception.message)
+                    is Result.Success -> {
+                        when (result.data.size) {
+                            0 -> view.showEmptyState()
+                            else -> view.showCharacters(result.data)
+                        }
+                    }
                 }
             }
         }
@@ -58,7 +64,7 @@ class FavoriteListPresenter(private val view: FavoriteListMVP.View) : FavoriteLi
     }
 
     private fun removeCharacterFromList(character: Character) {
-        val countDownTimer = object : CountDownTimer(COUNTDOWN_MILIS, 1000) {
+        val countDownTimer = object : CountDownTimer(COUNTDOWN_MILLIS, 1000) {
             override fun onTick(millisUntilFinished: Long) {
             }
 

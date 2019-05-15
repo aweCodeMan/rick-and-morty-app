@@ -1,6 +1,7 @@
 package com.codescrubs.rickandmortyapp.ui.activities.main
 
 import com.codescrubs.rickandmortyapp.data.api.DataSource
+import com.codescrubs.rickandmortyapp.data.api.response.Result
 import com.codescrubs.rickandmortyapp.data.api.response.PaginatedResult
 import com.codescrubs.rickandmortyapp.domain.Character
 import com.codescrubs.rickandmortyapp.mvp.CharacterListMVP
@@ -53,12 +54,19 @@ class CharacterListPresenter(private val view: CharacterListMVP.View) : Characte
 
             launch {
                 val result = dataSource.getNextPageOfPaginatedCharacters(it)
-                paginatedCharacters = result
 
                 withContext(Dispatchers.Main) {
-                    view.addCharacters(result.results)
                     view.hideProgress()
-                    isLoadingNextPage = false
+
+                    when (result) {
+                        is Result.Error -> view.showError(result.exception.message)
+                        is Result.Success -> {
+                            paginatedCharacters = result.data
+
+                            view.addCharacters(result.data.results)
+                            isLoadingNextPage = false
+                        }
+                    }
                 }
             }
         }
@@ -69,11 +77,18 @@ class CharacterListPresenter(private val view: CharacterListMVP.View) : Characte
 
         launch {
             val result = dataSource.getPaginatedCharacters()
-            paginatedCharacters = result
 
             withContext(Dispatchers.Main) {
-                view.showCharacters(result.results)
                 view.hideProgress()
+
+                when (result) {
+                    is Result.Error -> view.showError(result.exception.message)
+                    is Result.Success -> {
+                        paginatedCharacters = result.data
+
+                        view.showCharacters(result.data.results)
+                    }
+                }
             }
         }
     }

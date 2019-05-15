@@ -13,6 +13,7 @@ import com.codescrubs.rickandmortyapp.R
 import com.codescrubs.rickandmortyapp.domain.Character
 import com.codescrubs.rickandmortyapp.mvp.FavoriteListMVP
 import com.codescrubs.rickandmortyapp.ui.activities.CharacterDetailActivity
+import com.codescrubs.rickandmortyapp.ui.activities.base.BaseActivity
 import com.codescrubs.rickandmortyapp.ui.adapters.CharacterListAdapter
 import kotlinx.android.synthetic.main.fragment_character_list.characterList
 import kotlinx.android.synthetic.main.fragment_character_list.swipeCharacterListContainer
@@ -97,5 +98,11 @@ class FavoriteListFragment : Fragment(), FavoriteListMVP.View {
     private fun setupCharacterListRecyclerView() {
         val layoutManager = LinearLayoutManager(context)
         characterList.layoutManager = layoutManager
+    }
+
+    override fun showError(message: String?) {
+        message?.let {
+            (activity as BaseActivity).showRetryError(characterList, message, getText(R.string.retry).toString()) { presenter.onStart() }
+        }
     }
 }

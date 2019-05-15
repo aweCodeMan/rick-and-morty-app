@@ -3,12 +3,14 @@ package com.codescrubs.rickandmortyapp.data.api
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
 import android.util.ArraySet
-import android.util.Log
 import com.codescrubs.rickandmortyapp.data.api.response.PaginatedResult
+import com.codescrubs.rickandmortyapp.data.api.response.Result
 import com.codescrubs.rickandmortyapp.domain.Character
 import com.codescrubs.rickandmortyapp.domain.Location
 import com.codescrubs.rickandmortyapp.ui.App
+import java.io.IOException
 
+//  TODO: Refactor this into Character/Location repository with a dedicated API server handler
 class DataSource(private val client: RickAndMortyAPI = RickAndMortyClient.rickAndMortyAPI) {
 
     private val preferences: SharedPreferences by lazy { PreferenceManager.getDefaultSharedPreferences(App.instance) }
@@ -17,35 +19,96 @@ class DataSource(private val client: RickAndMortyAPI = RickAndMortyClient.rickAn
         private const val FAVORITE_CHARACTERS = "favorites"
     }
 
-    suspend fun getPaginatedCharacters(): PaginatedResult<Character> {
-        val result = client.getPaginatedCharactersAsync().await()
-        return PaginatedResult(result.info, handleFavorite(result.results))
-    }
+    suspend fun getPaginatedCharacters(): Result<PaginatedResult<Character>> {
+        try {
+            val response = client.getPaginatedCharactersAsync().await()
 
-    suspend fun getFavoriteCharacters(): List<Character> {
-        val favorites = preferences.getStringSet(FAVORITE_CHARACTERS, ArraySet())!!.toList()
+            if (!response.isSuccessful) {
+                return Result.Error(IOException(response.errorBody().toString()))
+            }
 
-        return when (favorites.size) {
-            0 -> listOf()
-            1 -> listOf(handleFavorite(client.getCharacterAsync(favorites[0]).await()))
-            else -> handleFavorite(client.getCharactersAsync(favorites.joinToString(separator = ",")).await())
+            val body = response.body()!!
+            return Result.Success(PaginatedResult(body.info, handleFavorite(body.results)))
+        } catch (exception: Exception) {
+            return Result.Error(IOException(exception.message))
         }
     }
 
-    suspend fun getCharactersByURLs(characterURLs: List<String>): List<Character> {
-        //  TODO: Use regex to extract the ID of the character from the URL
-        val ids = characterURLs.map { it.replace("https://rickandmortyapi.com/api/character/", "") }
-        return handleFavorite(client.getCharactersAsync(ids.joinToString(separator = ",")).await())
+    //  TODO: Abstract the logic of handling server response (single character returns an object, otherwise a list)
+    suspend fun getFavoriteCharacters(): Result<List<Character>> {
+        try {
+            val favorites = preferences.getStringSet(FAVORITE_CHARACTERS, ArraySet())!!.toList()
+
+            if (favorites.isEmpty()) {
+                return Result.Success(listOf())
+            }
+
+            val response = when (favorites.size) {
+                1 -> client.getCharacterAsync(favorites[0]).await()
+                else -> client.getCharactersAsync(favorites.joinToString(separator = ",")).await()
+            }
+
+            if (!response.isSuccessful) {
+                return Result.Error(IOException(response.errorBody().toString()))
+            }
+
+            return when (favorites.size) {
+                1 -> Result.Success(listOf(handleFavorite(response.body()!! as Character)))
+                else -> Result.Success(handleFavorite(response.body()!! as List<Character>))
+            }
+        } catch (exception: Exception) {
+            return Result.Error(IOException(exception.message))
+        }
+    }
+
+    suspend fun getCharactersByURLs(characterURLs: List<String>): Result<List<Character>> {
+        try {
+            //  TODO: Use regex to extract the ID of the character from the URL
+            val ids = characterURLs.map { it.replace("https://rickandmortyapi.com/api/character/", "") }
+
+            val response = client.getCharactersAsync(ids.joinToString(separator = ",")).await()
+
+            if (!response.isSuccessful) {
+                return Result.Error(IOException(response.errorBody().toString()))
+            }
+
+            return Result.Success(handleFavorite(response.body()!!))
+        } catch (exception: Exception) {
+            return Result.Error(IOException(exception.message))
+        }
     }
 
     //  TODO: It would be better to pass in PaginatedResult and handle the next page url logic here
-    suspend fun getNextPageOfPaginatedCharacters(pageUrl: String): PaginatedResult<Character> {
-        val result = client.getPaginatedCharactersAsync(pageUrl).await()
-        return PaginatedResult(result.info, handleFavorite(result.results))
+    suspend fun getNextPageOfPaginatedCharacters(pageUrl: String): Result<PaginatedResult<Character>> {
+        try {
+
+            val response = client.getPaginatedCharactersAsync(pageUrl).await()
+
+            if (!response.isSuccessful) {
+                return Result.Error(IOException(response.errorBody().toString()))
+            }
+
+            val body = response.body()!!
+            return Result.Success(PaginatedResult(body.info, handleFavorite(body.results)))
+        } catch (exception: Exception) {
+            return Result.Error(IOException(exception.message))
+        }
     }
 
-    suspend fun getLocation(url: String): Location {
-        return client.getLocationAsync(url).await()
+    suspend fun getLocation(url: String): Result<Location> {
+        try {
+
+            val response = client.getLocationAsync(url).await()
+
+            if (!response.isSuccessful) {
+                return Result.Error(IOException(response.errorBody().toString()))
+            }
+
+            return Result.Success(response.body()!!)
+
+        } catch (exception: Exception) {
+            return Result.Error(IOException(exception.message))
+        }
     }
 
     fun favorCharacter(character: Character): Character {
@@ -87,6 +150,4 @@ class DataSource(private val client: RickAndMortyAPI = RickAndMortyClient.rickAn
         val favorites = preferences.getStringSet(FAVORITE_CHARACTERS, HashSet())
         return favorites!!.contains(character.id.toString())
     }
-
-
 }

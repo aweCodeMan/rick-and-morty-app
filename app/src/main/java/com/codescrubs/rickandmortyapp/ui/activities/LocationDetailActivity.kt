@@ -11,6 +11,7 @@ import kotlinx.android.synthetic.main.toolbar.*
 import org.jetbrains.anko.startActivity
 
 class LocationDetailActivity : BaseActivity(), LocationDetailMVP.View {
+
     lateinit var presenter: LocationDetailMVP.Presenter
 
     companion object {
@@ -68,5 +69,11 @@ class LocationDetailActivity : BaseActivity(), LocationDetailMVP.View {
 
     override fun showResidents(location: Location) {
         startActivity<LocationResidentsActivity>(LocationResidentsActivity.LOCATION to location)
+    }
+
+    override fun showError(message: String?) {
+        message?.let {
+            showRetryError(swipeContainer, message, getText(R.string.retry).toString()) { presenter.onStart() }
+        }
     }
 }

@@ -8,6 +8,7 @@ interface BaseCharacterListMVP {
         fun showCharacters(characters: List<Character>)
         fun showCharacterDetail(character: Character)
         fun updateCharacter(character: Character)
+        fun showError(message: String?)
     }
 
     interface Presenter {

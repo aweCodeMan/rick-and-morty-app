@@ -9,10 +9,12 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+
 import com.codescrubs.rickandmortyapp.R
 import com.codescrubs.rickandmortyapp.domain.Character
 import com.codescrubs.rickandmortyapp.mvp.CharacterListMVP
 import com.codescrubs.rickandmortyapp.ui.activities.CharacterDetailActivity
+import com.codescrubs.rickandmortyapp.ui.activities.base.BaseActivity
 import com.codescrubs.rickandmortyapp.ui.adapters.CharacterListAdapter
 import kotlinx.android.synthetic.main.fragment_character_list.*
 import org.jetbrains.anko.startActivity
@@ -102,5 +104,11 @@ class CharacterListFragment : Fragment(), CharacterListMVP.View {
 
     override fun showCharacterDetail(character: Character) {
         activity!!.startActivity<CharacterDetailActivity>(CharacterDetailActivity.CHARACTER to character)
+    }
+
+    override fun showError(message: String?) {
+        message?.let {
+            (activity as BaseActivity).showRetryError(characterList, message, getText(R.string.retry).toString()) { presenter.onRefreshSwiped() }
+        }
     }
 }

@@ -9,6 +9,7 @@ interface LocationDetailMVP {
         fun hideProgress()
         fun showLocation(location: Location)
         fun showResidents(location: Location)
+        fun showError(message: String?)
     }
 
     interface Presenter {

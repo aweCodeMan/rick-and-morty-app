@@ -95,4 +95,10 @@ class LocationResidentsActivity : BaseActivity(), LocationResidentsMVP.View {
         val layoutManager = LinearLayoutManager(this)
         characterList.layoutManager = layoutManager
     }
+
+    override fun showError(message: String?) {
+        message?.let {
+            showRetryError(characterList, message, getText(R.string.retry).toString()) { presenter.onStart() }
+        }
+    }
 }
