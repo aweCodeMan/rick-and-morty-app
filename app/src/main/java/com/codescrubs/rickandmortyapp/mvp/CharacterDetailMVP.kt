@@ -8,6 +8,7 @@ interface CharacterDetailMVP {
     interface View {
         fun showCharacter(character: Character)
         fun showLocationDetail(partialLocation: PartialLocation)
+        fun showUnknownLocationNotification()
     }
 
     interface Presenter {

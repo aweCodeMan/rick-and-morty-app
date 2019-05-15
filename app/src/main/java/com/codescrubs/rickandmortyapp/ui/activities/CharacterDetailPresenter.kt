@@ -13,7 +13,11 @@ class CharacterDetailPresenter(private val view: CharacterDetailMVP.View, privat
     }
 
     override fun onLocationClicked(partialLocation: PartialLocation) {
-        view.showLocationDetail(partialLocation)
+        if(partialLocation.name.toLowerCase() == "unknown") {
+            view.showUnknownLocationNotification()
+        } else {
+            view.showLocationDetail(partialLocation)
+        }
     }
 
     override fun onCharacterFavored(character: Character) {

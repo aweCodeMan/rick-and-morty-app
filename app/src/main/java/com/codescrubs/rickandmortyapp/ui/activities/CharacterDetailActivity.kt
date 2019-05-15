@@ -1,6 +1,7 @@
 package com.codescrubs.rickandmortyapp.ui.activities
 
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v4.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.codescrubs.rickandmortyapp.R
@@ -81,5 +82,11 @@ class CharacterDetailActivity : BaseActivity(), CharacterDetailMVP.View {
 
     override fun showLocationDetail(partialLocation: PartialLocation) {
         startActivity<LocationDetailActivity>(LocationDetailActivity.LOCATION to partialLocation)
+    }
+
+    override fun showUnknownLocationNotification() {
+        val snackBar = Snackbar.make(container, getString(R.string.unknown_location_notification), Snackbar.LENGTH_SHORT)
+        snackBar.view.setBackgroundColor(getColor(R.color.colorAccent))
+        snackBar.show()
     }
 }

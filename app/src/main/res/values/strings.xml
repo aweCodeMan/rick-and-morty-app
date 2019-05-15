@@ -11,4 +11,5 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="favorites_empty_state">Favorite a character to make them show up here!</string>
     <string name="retry">Retry</string>
+    <string name="unknown_location_notification">Can\'t show residents for an unknown location</string>
 </resources>
