@@ -6,7 +6,7 @@ A Rick and Morty app that lists all of the characters and their locations. You c
 
 ![Rick and Morty app Demo](https://media.giphy.com/media/M8RRAEE0Df8XwjUJS0/giphy.gif)
 
-
+[Link to release](https://github.com/aweCodeMan/rick-and-morty-app/releases/tag/v1.0.0)
 
 ### Features
 
